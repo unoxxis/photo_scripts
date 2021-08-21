@@ -58,6 +58,7 @@ resizeflag=""
 filemode="rename"
 renamesuffix="_resized"
 subfoldername="resized"
+# Default spec from https://legacy.imagemagick.org/Usage/resize/#resize_unsharp
 unsharpop='0x0.75+0.75+0.008'
 unsharp=0
 filelist=()
@@ -69,7 +70,7 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
-# Parse verb
+# Parse verb into flag (see https://legacy.imagemagick.org/Usage/resize/#resize)
 case $1 in
     exact)                  resizeflag="!";;
     fit | fit-long)         resizeflag="";;
