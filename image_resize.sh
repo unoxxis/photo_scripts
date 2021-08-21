@@ -20,6 +20,8 @@ usage() {
     echo " grow-short              Like fit[-long], but only process images that would be grown."
     echo
     echo "OPTIONS:"
+    echo " -b | --deblur           Perform an 'unsharp' operation on the rescaled images."
+    echo " -B | --deblur-op spec   Perform an 'unsharp' operation on the rescaled images using the given spec."
     echo " -d | --dimensions size  Set both width and height to the specified value."
     echo " -h | --height height    Set the height parameter to the specified value."
     echo " --help                  Show this help."
@@ -56,6 +58,8 @@ resizeflag=""
 filemode="rename"
 renamesuffix="_resized"
 subfoldername="resized"
+unsharpop='0x0.75+0.75+0.008'
+unsharp=0
 filelist=()
 setheight=0
 setwidth=0
@@ -91,6 +95,14 @@ fi
 
 while [ "$1" != "" ]; do
     case $1 in
+        -b | --deblur)
+            unsharp=1
+            ;;
+        -B | --deblur-op)
+            shift
+            unsharp=1
+            unsharpop="$1"
+            ;;
         -d | --dimensions)
             shift
             setheight="$1"
@@ -158,6 +170,8 @@ echovv " Height         $setheight"
 echovv " Width          $setwidth"
 echovv " File mode      $filemode"
 echovv " Rename Suffix  $renamesuffix"
+echovv " Move Subfolder $subfoldername"
+echovv " Unsharp Spec   $unsharpop"
 echovv
 echovv "FILE LIST:"
 echovv "${filelist[@]}"
@@ -168,7 +182,7 @@ for file in "${filelist[@]}"; do
     echov "Processing $file..."
 
     # Get Image Dimensions
-    if [[ $verbose -ge 2 ]]; then
+    if [[ $verbose -ge 2 ]] || [[ "$unsharp" -gt 0 ]]; then
         read -r -d '' -a imgdim < <( magick identify -format "%[fx:w] %[fx:h]" "$file" && printf '\0')
         imgwidth=${imgdim[0]}
         imgheight=${imgdim[1]}
@@ -193,13 +207,19 @@ for file in "${filelist[@]}"; do
     convert "$file" -auto-orient -resize ${setheight}x${setwidth}${resizeflag} "$filenew"
 
     # Get Image Dimensions
-    if [[ $verbose -ge 2 ]]; then
+    if [[ $verbose -ge 2 ]] || [[ "$unsharp" -gt 0 ]]; then
         read -r -d '' -a imgdim < <( magick identify -format "%[fx:w] %[fx:h]" "$filenew" && printf '\0')
-        imgwidth=${imgdim[0]}
-        imgheight=${imgdim[1]}
-        echovv "New Image Dimensions are $imgwidth x $imgheight."
-        echovv
+        nimgwidth=${imgdim[0]}
+        nimgheight=${imgdim[1]}
+        echovv "New Image Dimensions are $nimgwidth x $nimgheight."
     fi
+
+    if [[ "$unsharp" -gt 0 ]] && [[ "$nimgheight" -ne "$imgheight" ]] && [[ "$nimgwidth" -ne "$imgheight" ]]; then
+        echov "Unsharpening $filenew..."
+        convert "$filenew" -unsharp "$unsharpop" "$filenew"
+    fi
+
+    echovv
 done
 
 echo "Done processing ${#filelist[@]} files."
