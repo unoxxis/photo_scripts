@@ -42,7 +42,7 @@ echovv() {
     [[ $verbose -ge 2 ]] && echo "$@"
 }
 
-SCRIPT_PATH="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# SCRIPT_PATH="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # Check for image magick
 command -v magick >/dev/null 2>&1 || { 
@@ -205,7 +205,7 @@ for file in "${filelist[@]}"; do
     fi
 
     echov "Resizing $file > $filenew..."
-    convert "$file" -auto-orient -resize ${setheight}x${setwidth}${resizeflag} "$filenew"
+    convert "$file" -auto-orient -resize "${setheight}"x"${setwidth}"${resizeflag} "$filenew"
 
     # Get Image Dimensions
     if [[ $verbose -ge 2 ]] || [[ "$unsharp" -gt 0 ]]; then
