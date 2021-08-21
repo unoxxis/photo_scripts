@@ -77,13 +77,15 @@ case $1 in
     *)                      resizeflag="undefined";;
 esac
 
+myverb="$1"
+shift
+
 if [[ "$resizeflag" == "undefined" ]]; then
-    echo "ERROR: Unknown verb '$1'." >& 2
+    echo "ERROR: Unknown verb '$myverb'." >& 2
     echo
     usage
     exit 1
 fi
-shift
 
 # Parse further arguments
 
@@ -150,11 +152,11 @@ fi
 
 echovv
 echovv "Parsing done, results:"
-echovv "MAGICK RESIZE FLAG: $resizeflag"
+echovv "MAGICK RESIZE FLAG: $resizeflag (from $myverb)"
 echovv "OPTIONS:"
 echovv " Height         $setheight"
 echovv " Width          $setwidth"
-echovv " File resizeflag      $filemode"
+echovv " File mode      $filemode"
 echovv " Rename Suffix  $renamesuffix"
 echovv
 echovv "FILE LIST:"
