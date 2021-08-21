@@ -199,3 +199,5 @@ for file in "${filelist[@]}"; do
         echovv
     fi
 done
+
+echo "Done processing ${#filelist[@]} files."
