@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Shrink to fit into bounding box, keep aspect ratio
-# Do not touch images small enough.
+# Batch resize images using ImageMagick convert
 
 usage() {
     echo "usage: $0 <verb> [-w width] [-h height] [-s size] [further options] imagefiles"
